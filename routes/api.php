@@ -1,14 +1,15 @@
 <?php
 
+use App\Http\Controllers\Api\Auth\EmailVerificationController;
+use App\Http\Controllers\Api\Auth\LoginController;
+use App\Http\Controllers\Api\Auth\RegisterController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
 
 
-
 // routes/api.php
-use App\Http\Controllers\Api\Auth\EmailVerificationController;
-use App\Http\Controllers\Api\Auth\LoginController;
-use App\Http\Controllers\Api\Auth\RegisterController;
+
+
 
 Route::get('/ping', function () {
     return response()->json(['success' => true]);
@@ -37,7 +38,6 @@ Route::middleware('auth:sanctum')->group(function () {
             return $request->user();
         });
     });
-
-    Route::post('/otp/generate', [\App\Http\Controllers\Api\OtpController::class, 'generate']);
-    Route::post('/otp/verify', [\App\Http\Controllers\Api\OtpController::class, 'verify']);
+    Route::post('/otp/generate', [\App\Http\Controllers\Api\Auth\OtpController::class, 'generate']);
+    Route::post('/otp/verify', [\App\Http\Controllers\Api\Auth\OtpController::class, 'verify']);
 });
