@@ -2,14 +2,14 @@
 
 namespace App\Http\Controllers\Api\Auth;
 
-use App\Http\Controllers\Controller;
+use App\Http\Controllers\Api\BaseApiController;
 use App\Models\User;
 use App\Services\OtpService;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Hash;
 use Illuminate\Http\JsonResponse;
 
-class RegisterController extends Controller
+class RegisterController extends BaseApiController
 {
     public function __construct(
         private OtpService $otpService
@@ -17,16 +17,16 @@ class RegisterController extends Controller
 
     public function register(Request $request): JsonResponse
     {
-        $request->validate([
+        $validated = $this->validateRequest($request->all(), [
             'name' => 'required|string|max:255',
             'email' => 'required|string|email|max:255|unique:users',
             'password' => 'required|string|min:8|confirmed',
         ]);
 
         $user = User::create([
-            'name' => $request->name,
-            'email' => $request->email,
-            'password' => Hash::make($request->password),
+            'name' => $validated['name'],
+            'email' => $validated['email'],
+            'password' => Hash::make($validated['password']),
         ]);
 
         // Send verification OTP
@@ -35,10 +35,9 @@ class RegisterController extends Controller
         // Create token for the new user
         $token = $user->createToken('auth_token')->plainTextToken;
 
-        return response()->json([
-            'message' => 'Registration successful',
+        return $this->successResponse([
             'token' => $token,
             'user' => $user
-        ], 201);
+        ], 'Registration successful', 201);
     }
 }
